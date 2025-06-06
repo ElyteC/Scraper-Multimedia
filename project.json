@@ -1,0 +1,58 @@
+{
+  "name": "Scraper Multimedia",
+  "version": "1.0",
+  "description": "🎵 Herramienta avanzada para radio online y música con gestión multimedia completa",
+  "author": {
+    "name": "ElyteC",
+    "email": "contacto@elytec.dev",
+    "github": "https://github.com/ElyteC"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ElyteC/Scraper-Multimedia.git"
+  },
+  "license": "MIT",
+  "main": "Scraper_Multimedia_v1.0.html",
+  "features": [
+    "Radio Online Streaming",
+    "Audio Player con controles avanzados",
+    "Sistema de favoritos y playlist",
+    "Búsqueda avanzada con filtros",
+    "Interfaz responsiva y moderna",
+    "Gestión de biblioteca musical",
+    "Auto-discovery de estaciones",
+    "Verificación automática de enlaces",
+    "Estadísticas de reproducción",
+    "Exportar/Importar configuraciones"
+  ],
+  "technologies": [
+    "HTML5",
+    "CSS3",
+    "JavaScript ES6+",
+    "Web Audio API",
+    "LocalStorage",
+    "Responsive Design"
+  ],
+  "browsers_supported": [
+    "Chrome 80+",
+    "Firefox 75+",
+    "Safari 13+",
+    "Edge 80+",
+    "Opera 70+"
+  ],
+  "languages_supported": [
+    "Spanish",
+    "English"
+  ],
+  "audio_formats": [
+    "MP3",
+    "AAC",
+    "OGG",
+    "WebM"
+  ],
+  "created": "2025-06-06",
+  "last_updated": "2025-06-06",
+  "status": "active",
+  "public": true,
+  "category": "multimedia"
+}
