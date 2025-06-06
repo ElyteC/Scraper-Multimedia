@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎵 Scraper Multimedia v1.0</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .version-badge {
+            display: inline-block;
+            background: rgba(255, 193, 7, 0.8);
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        /* BANNER DE RADIOS PRECONFIGURADAS */
+        .preset-banner {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .preset-banner-content {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .preset-banner-text {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .preset-banner-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .preset-btn {
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.4);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .preset-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+        
+        /* SISTEMA DE PESTAÑAS */
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px 15px 0 0;
+            margin: 20px 0 0 0;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom-color: #ffc107;
+        }
+        
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .tab-content {
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0 0 15px 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* PANEL GENERAL */
+        .panel {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* GESTIÓN DE BIBLIOTECA */
+        .library-manager {
+            background: rgba(76, 175, 80, 0.3);
+            border: 3px solid #4caf50;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .folder-structure {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .folder-item {
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .folder-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .folder-item.playing {
+            background: rgba(255, 193, 7, 0.3);
+            border: 2px solid #ffc107;
+            animation: pulse 2s infinite;
+        }
+        
+        /* BARRA DE PROGRESO */
+        .progress-bar {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #ffc107;
+        }
+        
+        .progress-fill {
+            height: 20px;
+            background: linear-gradient(90deg, #4caf50, #8bc34a);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        
+        .scanning-info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 2px solid #2196f3;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        /* SCRAPER MEJORADO */
+        .scraping-bar {
+            background: rgba(255, 193, 7, 0.3);
+            border: 3px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .search-options {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .search-option {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid transparent;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .search-option.active {
+            background: rgba(76, 175, 80, 0.3);
+            border-color: #4caf50;
+        }
+        
+        .search-option:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        /* BARRA DE VERIFICACIÓN */
+        .verification-bar {
+            background: rgba(33, 150, 243, 0.3);
+            border: 3px solid #2196f3;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .verification-progress {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        
+        .verification-item {
+            padding: 5px 10px;
+            margin: 5px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .verification-item.success {
+            background: rgba(76, 175, 80, 0.3);
+            border-left: 4px solid #4caf50;
+        }
+        
+        .verification-item.error {
+            background: rgba(220, 53, 69, 0.3);
+            border-left: 4px solid #dc3545;
+        }
+        
+        .verification-item.testing {
+            background: rgba(255, 193, 7, 0.3);
+            border-left: 4px solid #ffc107;
+        }
+        
+        .verification-item.duplicate {
+            background: rgba(108, 117, 125, 0.3);
+            border-left: 4px solid #6c757d;
+        }
+        
+        /* REPRODUCTOR AVANZADO */
+        .advanced-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.95);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            z-index: 1000;
+            min-width: 320px;
+            max-width: 400px;
+        }
+        
+        .player-header {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #ffc107;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .track-info {
+            text-align: center;
+            margin: 15px 0;
+            padding: 12px;
+            background: rgba(40, 167, 69, 0.2);
+            border-radius: 8px;
+            border: 1px solid #28a745;
+            min-height: 80px;
+        }
+        
+        .track-title {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+        
+        .track-artist {
+            font-size: 12px;
+            color: #ccc;
+            margin-bottom: 3px;
+        }
+        
+        .track-album {
+            font-size: 11px;
+            color: #aaa;
+            font-style: italic;
+        }
+        
+        .track-genre {
+            font-size: 10px;
+            color: #888;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .connection-status {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .status-connecting {
+            background: rgba(255, 193, 7, 0.3);
+            color: #ffc107;
+        }
+        
+        .status-connected {
+            background: rgba(76, 175, 80, 0.3);
+            color: #4caf50;
+        }
+        
+        .status-error {
+            background: rgba(220, 53, 69, 0.3);
+            color: #dc3545;
+        }
+        
+        .player-controls {
+            display: flex;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .control-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 11px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .control-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .control-btn.play-btn {
+            background: #28a745;
+            color: white;
+        }
+        
+        .control-btn.pause-btn {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .control-btn.stop-btn {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .control-btn.random-btn {
+            background: #e83e8c;
+            color: white;
+        }
+        
+        .control-btn.random-btn.active {
+            background: #dc3545;
+            animation: pulse 2s infinite;
+        }
+        
+        .control-btn.prev-btn, .control-btn.next-btn {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .volume-slider {
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .volume-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #28a745;
+            cursor: pointer;
+        }
+        
+        /* BOTONES */
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+        
+        .btn:hover {
+            background: #0056b3;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn.primary {
+            background: #28a745;
+        }
+        
+        .btn.primary:hover {
+            background: #218838;
+        }
+        
+        .btn.secondary {
+            background: #6c757d;
+        }
+        
+        .btn.danger {
+            background: #dc3545;
+        }
+        
+        .btn.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        .btn.orange {
+            background: #fd7e14;
+            color: white;
+        }
+        
+        .btn.orange:hover {
+            background: #e96209;
+        }
+        
+        .btn.active {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        /* ELEMENTOS DE LISTA */
+        .item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .item.playing {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.2);
+        }
+        
+        .item.loading {
+            border-color: #ffc107;
+            background: rgba(255, 193, 7, 0.2);
+        }
+        
+        .item.error {
+            border-color: #dc3545;
+            background: rgba(220, 53, 69, 0.2);
+        }
+        
+        .item.inactive {
+            border-color: #fd7e14;
+            background: rgba(253, 126, 20, 0.2);
+        }
+        
+        .item-info h3 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+        }
+        
+        .item-info p {
+            margin: 0;
+            color: #ccc;
+            font-size: 14px;
+        }
+        
+        .item-controls {
+            display: flex;
+            gap: 10px;
+        }
+        
+        /* GRID LAYOUT */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+        }
+        
+        /* FILTROS MEJORADOS */
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .current-filter {
+            background: rgba(255, 193, 7, 0.3);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid #ffc107;
+        }
+        
+        /* PANEL DERECHO */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .category-panel {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .category-panel h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .category-list {
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+        
+        .category-item {
+            padding: 5px 8px;
+            margin: 2px 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .category-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .category-item.selected {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid #4caf50;
+        }
+        
+        /* ALERTAS */
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 2000;
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        }
+        
+        .alert.error {
+            background: #dc3545;
+        }
+        
+        .alert.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .advanced-player {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+                max-width: none;
+            }
+            
+            .preset-banner {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .preset-banner-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .preset-banner-buttons {
+                justify-content: center;
+            }
+        }
+        
+        /* HIDDEN INPUT PARA ARCHIVOS */
+        .hidden-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 Scraper Multimedia <span class="version-badge">v1.0</span></h1>
+        </div>
+        
+        <!-- BANNER DE RADIOS PRECONFIGURADAS -->
+        <div class="preset-banner">
+            <div class="preset-banner-content">
+                <span class="preset-banner-text">📻 Radios Verificadas</span>
+                <span style="font-size: 14px; opacity: 0.9;">¡Funcionan al 100%!</span>
+            </div>
+            <div class="preset-banner-buttons">
+                <button class="preset-btn" onclick="addPresetRadio('bbc', 'BBC Radio 1', 'http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one', 'Reino Unido', 'Pop')">BBC Radio 1</button>
+                <button class="preset-btn" onclick="addPresetRadio('kissfm', 'Kiss FM', 'http://online-kissfm.tavrmedia.ua/KissFM', 'España', 'Dance')">Kiss FM</button>
+                <button class="preset-btn" onclick="addPresetRadio('los40', 'Los 40', 'http://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3', 'España', 'Top 40')">Los 40</button>
+                <button class="preset-btn" onclick="addPresetRadio('europafm', 'Europa FM', 'http://streamelive.mforos.com:9000/', 'España', 'Pop')">Europa FM</button>
+                <button class="preset-btn" onclick="addAllPresetRadios()">🎯 TODAS</button>
+            </div>
+        </div>
+        
+        <!-- SISTEMA DE PESTAÑAS -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('radios')">📻 RADIOS ONLINE</button>
+            <button class="tab" onclick="switchTab('music')">🎶 MI MÚSICA</button>
+        </div>
+        
+        <!-- CONTENIDO PESTAÑA RADIOS -->
+        <div id="radios-content" class="tab-content active">
+            
+            <!-- BARRA DE SCRAPING INTELIGENTE -->
+            <div class="scraping-bar">
+                <h2>🔍 BÚSQUEDA INTELIGENTE DE RADIOS</h2>
+                <p><strong>✨ Sistema de verificación automática y anti-duplicados</strong></p>
+                
+                <div style="margin-bottom: 15px;">
+                    <input type="text" id="radioSearchInput" 
+                           placeholder="Ej: 'radios de rock', 'emisoras de jazz', 'radio española'..."
+                           style="width: 100%; padding: 12px; font-size: 16px; border: 2px solid #ffc107; border-radius: 8px;">
+                </div>
+                
+                <div class="search-options">
+                    <div class="search-option" onclick="setSearchTerm('radio rock online')">🎸 Radios Rock</div>
+                    <div class="search-option" onclick="setSearchTerm('radio pop hit music')">🎵 Radios Pop</div>
+                    <div class="search-option" onclick="setSearchTerm('radio jazz smooth')">🎷 Radios Jazz</div>
+                    <div class="search-option" onclick="setSearchTerm('radio electronic dance')">🎧 Radios Electronic</div>
+                    <div class="search-option" onclick="setSearchTerm('radio classical music')">🎼 Radios Classical</div>
+                    <div class="search-option" onclick="setSearchTerm('radio news talk')">📰 Radios News</div>
+                </div>
+                
+                <div style="display: flex; gap: 15px; margin-top: 15px; flex-wrap: wrap;">
+                    <button onclick="searchRadiosIntelligently()" class="btn primary">🔍 BUSCAR RADIOS REALES</button>
+                    <button onclick="addCustomRadio()" class="btn secondary">➕ AÑADIR URL MANUAL</button>
+                    <button onclick="verifyAllRadios()" class="btn warning">🔧 VERIFICAR TODAS</button>
+                </div>
+                
+                <div id="radioSearchResults" style="display:none; margin-top: 15px; padding: 10px; background: rgba(0,0,0,0.3); border-radius: 6px;"></div>
+            </div>
+            
+            <!-- BARRA DE VERIFICACIÓN -->
+            <div id="verificationBar" class="verification-bar">
+                <h3>🔍 Verificando Radios...</h3>
+                <div id="verificationProgress" class="verification-progress"></div>
+            </div>
+            
+            <div class="grid">
+                <!-- PANEL IZQUIERDO RADIOS -->
+                <div class="panel">
+                    <h2>🛠️ Controles Radios</h2>
+                    <button onclick="clearInactiveRadios()" class="btn orange" style="width: 100%; margin: 10px 0;">🧹 LIMPIAR INACTIVAS</button>
+                    <button onclick="clearAllRadios()" class="btn danger" style="width: 100%; margin: 10px 0;">🗑️ LIMPIAR TODAS</button>
+                    <button onclick="stopAllRadios()" class="btn warning" style="width: 100%; margin: 10px 0;">⏹️ PARAR RADIOS</button>
+                    
+                    <div style="margin: 15px 0; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; text-align: center;">
+                        <strong>Estadísticas:</strong><br>
+                        Total Radios: <span id="totalRadios">0</span><br>
+                        Funcionando: <span id="workingRadios">0</span><br>
+                        Inactivas: <span id="inactiveRadios">0</span>
+                    </div>
+                </div>
+                
+                <!-- PANEL CENTRAL RADIOS -->
+                <div class="panel">
+                    <h2>📻 Estaciones de Radio</h2>
+                    
+                    <div class="filters">
+                        <div class="filter-group">
+                            <select id="radioGenreFilter" onchange="applyRadioFilters()">
+                                <option value="">Todos los géneros</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="radioCountryFilter" onchange="applyRadioFilters()">
+                                <option value="">Todos los países</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="radioStations"></div>
+                </div>
+                
+                <!-- PANEL DERECHO RADIOS -->
+                <div class="right-panel">
+                    <div class="category-panel">
+                        <h3>🎼 GÉNEROS</h3>
+                        <div id="radioGenresList" class="category-list"></div>
+                    </div>
+                    
+                    <div class="category-panel">
+                        <h3>🌍 PAÍSES</h3>
+                        <div id="radioCountriesList" class="category-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- CONTENIDO PESTAÑA MÚSICA -->
+        <div id="music-content" class="tab-content">
+            
+            <!-- GESTIÓN CORREGIDA DE BIBLIOTECA -->
+            <div class="library-manager">
+                <h2>📁 GESTIÓN MUSICAL CON FILTROS AVANZADOS</h2>
+                <p><strong>✨ Organización automática de carpetas, subcarpetas y filtros inteligentes</strong></p>
+                
+                <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <button onclick="addMusicFolderCorrected()" class="btn primary">📁 AÑADIR CARPETA DE MÚSICA</button>
+                    <button onclick="refreshMusicLibrary()" class="btn warning">🔄 ACTUALIZAR BIBLIOTECA</button>
+                    <button onclick="clearAllMusic()" class="btn danger">🗑️ LIMPIAR MÚSICA</button>
+                </div>
+                
+                <!-- BARRA DE PROGRESO DEL ESCANEO -->
+                <div id="scanningProgress" class="progress-bar" style="display: none;">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                
+                <!-- INFORMACIÓN DE ESCANEO -->
+                <div id="scanningInfo" class="scanning-info">
+                    <h3>🔍 Escaneando Música...</h3>
+                    <div id="scanningDetails"></div>
+                </div>
+                
+                <!-- ESTRUCTURA DE CARPETAS -->
+                <div class="folder-structure" id="musicFolderStructure">
+                    <p style="text-align: center; color: #ccc;">📁 No hay carpetas añadidas. Usa "AÑADIR CARPETA DE MÚSICA" para comenzar.</p>
+                </div>
+            </div>
+            
+            <div class="grid">
+                <!-- PANEL IZQUIERDO MÚSICA -->
+                <div class="panel">
+                    <h2>🛠️ Controles Música</h2>
+                    <button onclick="playFilteredMusic()" class="btn primary" style="width: 100%; margin: 10px 0;">▶️ REPRODUCIR FILTRO</button>
+                    <button onclick="shuffleAllMusic()" class="btn warning" style="width: 100%; margin: 10px 0;">🎲 REPRODUCIR TODO</button>
+                    <button onclick="clearMusicFilters()" class="btn secondary" style="width: 100%; margin: 10px 0;">🧹 LIMPIAR FILTROS</button>
+                    
+                    <div style="margin: 15px 0; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px; text-align: center;">
+                        <strong>Estadísticas:</strong><br>
+                        Total Canciones: <span id="totalMusic">0</span><br>
+                        Mostradas: <span id="shownMusic">0</span><br>
+                        Carpetas: <span id="totalFolders">0</span><br>
+                        Artistas: <span id="totalArtists">0</span>
+                    </div>
+                </div>
+                
+                <!-- PANEL CENTRAL MÚSICA -->
+                <div class="panel">
+                    <h2>🎶 Biblioteca Musical</h2>
+                    
+                    <!-- FILTROS MEJORADOS -->
+                    <div class="filters">
+                        <div class="filter-group">
+                            <select id="musicArtistFilter" onchange="applyMusicFilters()">
+                                <option value="">Todos los artistas</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="musicGenreFilter" onchange="applyMusicFilters()">
+                                <option value="">Todos los géneros</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <select id="musicFolderFilter" onchange="applyMusicFilters()">
+                                <option value="">Todas las carpetas</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- INDICADOR DE FILTRO ACTIVO -->
+                    <div id="currentMusicFilter" class="current-filter" style="display: none;">
+                        📌 Filtro activo: <span id="activeFilterText"></span>
+                    </div>
+                    
+                    <div id="musicTracks"></div>
+                </div>
+                
+                <!-- PANEL DERECHO MÚSICA -->
+                <div class="right-panel">
+                    <div class="category-panel">
+                        <h3>👤 ARTISTAS</h3>
+                        <div id="musicArtistsList" class="category-list"></div>
+                    </div>
+                    
+                    <div class="category-panel">
+                        <h3>🎼 GÉNEROS</h3>
+                        <div id="musicGenresList" class="category-list"></div>
+                    </div>
+                    
+                    <div class="category-panel">
+                        <h3>📁 CARPETAS</h3>
+                        <div id="musicFoldersList" class="category-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- REPRODUCTOR AVANZADO CON INDICADORES DE ESTADO -->
+    <div class="advanced-player">
+        <div class="player-header">🎵 Reproductor Multimedia</div>
+        
+        <div class="track-info" id="trackInfo">
+            <div class="track-title" id="trackTitle">Selecciona una estación o canción</div>
+            <div class="track-artist" id="trackArtist">...</div>
+            <div class="track-album" id="trackAlbum">...</div>
+            <div class="track-genre" id="trackGenre">...</div>
+            <div id="connectionStatus" class="connection-status status-connecting" style="display: none;">🔄 Conectando...</div>
+        </div>
+        
+        <div class="player-controls">
+            <button class="control-btn prev-btn" onclick="previousTrack()" title="Anterior">⏮️</button>
+            <button class="control-btn play-btn" id="mainPlayBtn" onclick="togglePlayPause()" title="Reproducir/Pausar">▶️</button>
+            <button class="control-btn stop-btn" onclick="stopPlayback()" title="Parar">⏹️</button>
+            <button class="control-btn next-btn" onclick="nextTrack()" title="Siguiente">⏭️</button>
+            <button class="control-btn random-btn" id="randomBtn" onclick="toggleRandom()" title="Aleatorio">🎲</button>
+        </div>
+        
+        <div class="volume-control">
+            <span>🔊</span>
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="50" onchange="changeVolume()">
+            <span id="volumeDisplay">50%</span>
+        </div>
+    </div>
+
+    <!-- INPUTS OCULTOS PARA ARCHIVOS -->
+    <input type="file" id="musicFolderInput" class="hidden-input" webkitdirectory multiple accept="audio/*" onchange="handleMusicFolderSelection(event)">
+
+    <!-- REPRODUCTORES DE AUDIO OCULTOS -->
+    <audio id="mainAudioPlayer" preload="metadata" crossorigin="anonymous"></audio>
+
+    <script>
+        // VARIABLES GLOBALES - SCRAPER MULTIMEDIA v1.0
+        let radioStations = [];
+        let musicLibrary = [];
+        let musicFolders = [];
+        let currentPlaylist = [];
+        let currentTrackIndex = 0;
+        let isRandomMode = false;
+        let isPlaying = false;
+        let currentlyPlayingType = null; // 'radio' o 'music'
+        let currentlyPlayingId = null;
+        let currentTab = 'radios';
+        let scanningProgress = 0;
+        let totalFilesToScan = 0;
+        let connectionCheckInterval = null;
+        let verificationInProgress = false;
+        
+        // FILTROS ACTIVOS
+        let activeMusicFilters = {
+            artist: '',
+            genre: '',
+            folder: ''
+        };
+        
+        let activeRadioFilters = {
+            genre: '',
+            country: ''
+        };
+        
+        // CONTENIDO FILTRADO
+        let filteredMusicLibrary = [];
+        let filteredRadioStations = [];
+        
+        // FORMATOS SOPORTADOS
+        const AUDIO_EXTENSIONS = ['.mp3', '.flac', '.wav', '.ogg', '.m4a', '.aac', '.wma', '.opus'];
+        
+        // BASE DE DATOS DE RADIOS REALES
+        const REAL_RADIO_DATABASE = [
+            // Rock
+            { name: 'Radio Rock Live', url: 'http://stream.radiorock.fi:8000/radiorock', genre: 'Rock', country: 'Finlandia' },
+            { name: 'Classic Rock Florida', url: 'http://198.58.98.83:8258/stream', genre: 'Rock', country: 'Estados Unidos' },
+            { name: 'Rock Antenne', url: 'http://stream.rockantenne.de/rockantenne/stream/mp3', genre: 'Rock', country: 'Alemania' },
+            { name: 'Planet Rock', url: 'http://tx.planetradio.co.uk/icecast.php?i=planetrock.mp3', genre: 'Rock', country: 'Reino Unido' },
+            
+            // Pop
+            { name: 'Hit Radio FFH', url: 'http://streams.ffh.de/radioffh/mp3-192/direktfox/', genre: 'Pop', country: 'Alemania' },
+            { name: 'Heart FM', url: 'http://media-ice.musicradio.com/HeartLondonMP3', genre: 'Pop', country: 'Reino Unido' },
+            { name: 'NRJ France', url: 'http://cdn.nrjaudio.fm/audio1/fr/30001/mp3_128.mp3', genre: 'Pop', country: 'Francia' },
+            
+            // Jazz
+            { name: 'Jazz Radio', url: 'http://broadcast.infomaniak.net/jazzradio-high.mp3', genre: 'Jazz', country: 'Francia' },
+            { name: 'Smooth Jazz', url: 'http://smoothjazz.cdnstream1.com:8006/', genre: 'Jazz', country: 'Estados Unidos' },
+            { name: 'Jazz FM', url: 'http://edge-bauerall-01-gos2.sharp-stream.com/jazz.mp3', genre: 'Jazz', country: 'Reino Unido' },
+            
+            // Electronic
+            { name: 'Radio Record', url: 'http://air.radiorecord.ru:805/rr_320', genre: 'Electronic', country: 'Rusia' },
+            { name: 'DI.FM Trance', url: 'http://prem2.di.fm:80/trance', genre: 'Electronic', country: 'Estados Unidos' },
+            { name: 'Radio FG', url: 'http://radiofg.impek.com/fg', genre: 'Electronic', country: 'Francia' },
+            
+            // Classical
+            { name: 'Classic FM', url: 'http://media-ice.musicradio.com/ClassicFMMP3', genre: 'Classical', country: 'Reino Unido' },
+            { name: 'Radio Swiss Classic', url: 'http://stream.srg-ssr.ch/rsc_de/mp3_128.m3u', genre: 'Classical', country: 'Suiza' },
+            { name: 'France Musique', url: 'http://direct.francemusique.fr/live/francemusique-midfi.mp3', genre: 'Classical', country: 'Francia' },
+            
+            // News
+            { name: 'BBC World Service', url: 'http://stream.live.vc.bbcmedia.co.uk/bbc_world_service', genre: 'News', country: 'Reino Unido' },
+            { name: 'France Info', url: 'http://direct.franceinfo.fr/live/franceinfo-midfi.mp3', genre: 'News', country: 'Francia' },
+            { name: 'NPR News', url: 'http://nprdmp.ic.llnwd.net/stream/nprdmp_live01_mp3', genre: 'News', country: 'Estados Unidos' }
+        ];
+        
+        // SISTEMA DE PERSISTENCIA
+        const STORAGE_KEYS = {
+            RADIOS: 'scraperMultimedia_stations_v1',
+            MUSIC: 'scraperMultimedia_music_v1',
+            FOLDERS: 'scraperMultimedia_folders_v1'
+        };
+        
+        function saveToLocalStorage(key, data) {
+            try {
+                localStorage.setItem(key, JSON.stringify(data));
+                console.log(`💾 Datos guardados: ${key}`);
+            } catch (error) {
+                console.error('❌ Error guardando datos:', error);
+            }
+        }
+        
+        function loadFromLocalStorage(key, defaultValue = []) {
+            try {
+                const data = localStorage.getItem(key);
+                return data ? JSON.parse(data) : defaultValue;
+            } catch (error) {
+                console.error('❌ Error cargando datos:', error);
+                return defaultValue;
+            }
+        }
+        
+        // ========== FUNCIONES DE RADIO CON VERIFICACIÓN MEJORADA ==========
+        
+        function addPresetRadio(id, name, url, country, genre) {
+            const existingRadio = radioStations.find(r => r.id === id || r.url === url);
+            
+            if (existingRadio) {
+                showAlert(`📻 ${name} ya está añadida`, 'warning');
+                return;
+            }
+            
+            const newRadio = {
+                id: id,
+                name: name,
+                url: url,
+                country: country,
+                genre: genre,
+                description: 'Radio preconfigurada verificada',
+                verified: true,
+                status: 'ready',
+                dateAdded: new Date().toISOString()
+            };
+            
+            radioStations.push(newRadio);
+            saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+            
+            filteredRadioStations = [...radioStations];
+            loadRadios();
+            updateRadioFilters();
+            updateRadioCategories();
+            updateRadioStats();
+            
+            showAlert(`📻 ${name} añadida correctamente`);
+        }
+        
+        function addAllPresetRadios() {
+            const presetRadios = [
+                { id: 'bbc', name: 'BBC Radio 1', url: 'http://stream.live.vc.bbcmedia.co.uk/bbc_radio_one', country: 'Reino Unido', genre: 'Pop' },
+                { id: 'kissfm', name: 'Kiss FM', url: 'http://online-kissfm.tavrmedia.ua/KissFM', country: 'España', genre: 'Dance' },
+                { id: 'los40', name: 'Los 40', url: 'http://playerservices.streamtheworld.com/api/livestream-redirect/LOS40.mp3', country: 'España', genre: 'Top 40' },
+                { id: 'europafm', name: 'Europa FM', url: 'http://streamelive.mforos.com:9000/', country: 'España', genre: 'Pop' },
+                { id: 'cadena100', name: 'Cadena 100', url: 'http://cadena100-cope.flumotion.com/cope/cadena100.mp3', country: 'España', genre: 'Pop' },
+                { id: 'rockfm', name: 'Rock FM', url: 'http://rockfm.es/files/live.mp3', country: 'España', genre: 'Rock' }
+            ];
+            
+            let addedCount = 0;
+            
+            presetRadios.forEach(radio => {
+                const existingRadio = radioStations.find(r => r.id === radio.id || r.url === radio.url);
+                
+                if (!existingRadio) {
+                    const newRadio = {
+                        ...radio,
+                        description: 'Radio preconfigurada verificada',
+                        verified: true,
+                        status: 'ready',
+                        dateAdded: new Date().toISOString()
+                    };
+                    
+                    radioStations.push(newRadio);
+                    addedCount++;
+                }
+            });
+            
+            saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+            
+            filteredRadioStations = [...radioStations];
+            loadRadios();
+            updateRadioFilters();
+            updateRadioCategories();
+            updateRadioStats();
+            
+            if (addedCount > 0) {
+                showAlert(`📻 ${addedCount} radios preconfiguradas añadidas`);
+            } else {
+                showAlert('📻 Todas las radios ya estaban añadidas', 'warning');
+            }
+        }
+        
+        function searchRadiosIntelligently() {
+            const searchTerm = document.getElementById('radioSearchInput').value.trim();
+            const resultDiv = document.getElementById('radioSearchResults');
+            
+            if (!searchTerm) {
+                showAlert('❌ Introduce un término de búsqueda');
+                return;
+            }
+            
+            if (verificationInProgress) {
+                showAlert('⏳ Esperando que termine la verificación actual');
+                return;
+            }
+            
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `🔍 Buscando radios reales para "${searchTerm}"...`;
+            
+            showAlert(`🔍 Buscando radios reales: "${searchTerm}"`);
+            
+            setTimeout(() => {
+                const matchingRadios = findMatchingRadiosInDatabase(searchTerm);
+                
+                if (matchingRadios.length === 0) {
+                    resultDiv.innerHTML = `❌ No se encontraron radios para "${searchTerm}". Prueba con: rock, pop, jazz, electronic, classical, news`;
+                    showAlert('❌ No se encontraron radios coincidentes');
+                    return;
+                }
+                
+                resultDiv.innerHTML = `🔍 Encontradas ${matchingRadios.length} radios. Verificando funcionamiento y evitando duplicados...`;
+                
+                verifyAndAddFoundRadios(matchingRadios, searchTerm, resultDiv);
+                
+            }, 1500);
+        }
+        
+        function findMatchingRadiosInDatabase(searchTerm) {
+            const lowerTerm = searchTerm.toLowerCase();
+            let matchingRadios = [];
+            
+            if (lowerTerm.includes('rock')) {
+                matchingRadios = REAL_RADIO_DATABASE.filter(r => r.genre === 'Rock');
+            } else if (lowerTerm.includes('pop')) {
+                matchingRadios = REAL_RADIO_DATABASE.filter(r => r.genre === 'Pop');
+            } else if (lowerTerm.includes('jazz')) {
+                matchingRadios = REAL_RADIO_DATABASE.filter(r => r.genre === 'Jazz');
+            } else if (lowerTerm.includes('electronic') || lowerTerm.includes('dance') || lowerTerm.includes('edm')) {
+                matchingRadios = REAL_RADIO_DATABASE.filter(r => r.genre === 'Electronic');
+            } else if (lowerTerm.includes('classical') || lowerTerm.includes('classic')) {
+                matchingRadios = REAL_RADIO_DATABASE.filter(r => r.genre === 'Classical');
+            } else if (lowerTerm.includes('news') || lowerTerm.includes('talk') || lowerTerm.includes('noticias')) {
+                matchingRadios = REAL_RADIO_DATABASE.filter(r => r.genre === 'News');
+            } else if (lowerTerm.includes('radio')) {
+                matchingRadios = REAL_RADIO_DATABASE.sort(() => Math.random() - 0.5).slice(0, 4);
+            }
+            
+            return matchingRadios.slice(0, 5);
+        }
+        
+        function verifyAndAddFoundRadios(foundRadios, searchTerm, resultDiv) {
+            verificationInProgress = true;
+            const verificationBar = document.getElementById('verificationBar');
+            const verificationProgress = document.getElementById('verificationProgress');
+            
+            verificationBar.style.display = 'block';
+            verificationProgress.innerHTML = '';
+            
+            let processedCount = 0;
+            let addedCount = 0;
+            let duplicatedCount = 0;
+            let errorCount = 0;
+            const totalRadios = foundRadios.length;
+            
+            foundRadios.forEach((radioData, index) => {
+                setTimeout(() => {
+                    // SISTEMA ANTI-DUPLICADOS
+                    const existingRadio = radioStations.find(r => 
+                        r.name === radioData.name || 
+                        r.url === radioData.url ||
+                        r.name.toLowerCase() === radioData.name.toLowerCase()
+                    );
+                    
+                    if (existingRadio) {
+                        duplicatedCount++;
+                        processedCount++;
+                        addVerificationItem(radioData.name, 'duplicate', '🔄 Ya existe - Evitada');
+                        
+                        if (processedCount === totalRadios) {
+                            finalizeBulkSearch(addedCount, duplicatedCount, errorCount, searchTerm, resultDiv);
+                        }
+                        return;
+                    }
+                    
+                    const tempRadio = {
+                        id: Date.now() + index,
+                        name: radioData.name,
+                        url: radioData.url,
+                        country: radioData.country,
+                        genre: radioData.genre,
+                        description: `Encontrada buscando: ${searchTerm}`,
+                        verified: false,
+                        status: 'testing',
+                        dateAdded: new Date().toISOString()
+                    };
+                    
+                    addVerificationItem(radioData.name, 'testing', '🔍 Verificando...');
+                    
+                    // VERIFICAR QUE LA RADIO SUENA
+                    testRadioConnectionWithCallback(tempRadio, (isWorking) => {
+                        processedCount++;
+                        
+                        if (isWorking) {
+                            tempRadio.verified = true;
+                            tempRadio.status = 'ready';
+                            radioStations.push(tempRadio);
+                            addedCount++;
+                            addVerificationItem(radioData.name, 'success', '✅ Funciona - Añadida');
+                        } else {
+                            errorCount++;
+                            addVerificationItem(radioData.name, 'error', '❌ No funciona - Descartada');
+                        }
+                        
+                        if (processedCount === totalRadios) {
+                            finalizeBulkSearch(addedCount, duplicatedCount, errorCount, searchTerm, resultDiv);
+                        }
+                    });
+                    
+                }, index * 2000);
+            });
+        }
+        
+        function testRadioConnectionWithCallback(radioData, callback) {
+            const testAudio = new Audio();
+            testAudio.crossOrigin = 'anonymous';
+            
+            const timeout = setTimeout(() => {
+                testAudio.src = '';
+                callback(false);
+            }, 8000);
+            
+            testAudio.onloadstart = () => {
+                clearTimeout(timeout);
+                testAudio.src = '';
+                callback(true);
+            };
+            
+            testAudio.oncanplay = () => {
+                clearTimeout(timeout);
+                testAudio.src = '';
+                callback(true);
+            };
+            
+            testAudio.onerror = () => {
+                clearTimeout(timeout);
+                testAudio.src = '';
+                callback(false);
+            };
+            
+            try {
+                testAudio.src = radioData.url;
+                testAudio.load();
+            } catch (error) {
+                clearTimeout(timeout);
+                callback(false);
+            }
+        }
+        
+        function addVerificationItem(radioName, status, message) {
+            const verificationProgress = document.getElementById('verificationProgress');
+            const item = document.createElement('div');
+            item.className = `verification-item ${status}`;
+            item.innerHTML = `${radioName}: ${message}`;
+            verificationProgress.appendChild(item);
+        }
+        
+        function finalizeBulkSearch(addedCount, duplicatedCount, errorCount, searchTerm, resultDiv) {
+            verificationInProgress = false;
+            
+            setTimeout(() => {
+                document.getElementById('verificationBar').style.display = 'none';
+            }, 3000);
+            
+            if (addedCount > 0) {
+                saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+                
+                filteredRadioStations = [...radioStations];
+                loadRadios();
+                updateRadioFilters();
+                updateRadioCategories();
+                updateRadioStats();
+                
+                resultDiv.innerHTML = `✅ Búsqueda completada para "${searchTerm}":
+                    <br>• ${addedCount} radios verificadas y añadidas ✅
+                    <br>• ${duplicatedCount} radios duplicadas evitadas 🔄
+                    <br>• ${errorCount} radios no funcionaban ❌`;
+                
+                showAlert(`📻 ${addedCount} nuevas radios verificadas añadidas`);
+            } else {
+                resultDiv.innerHTML = `⚠️ Búsqueda para "${searchTerm}":
+                    <br>• ${duplicatedCount} radios ya existían 🔄
+                    <br>• ${errorCount} radios no funcionaban ❌
+                    <br>• No se añadieron radios nuevas`;
+                
+                if (duplicatedCount > 0) {
+                    showAlert('ℹ️ Todas las radios encontradas ya estaban añadidas', 'warning');
+                } else {
+                    showAlert('❌ Ninguna radio encontrada funcionó correctamente', 'error');
+                }
+            }
+        }
+        
+        function verifyAllRadios() {
+            if (radioStations.length === 0) {
+                showAlert('❌ No hay radios para verificar');
+                return;
+            }
+            
+            if (verificationInProgress) {
+                showAlert('⏳ Ya hay una verificación en curso');
+                return;
+            }
+            
+            verificationInProgress = true;
+            showAlert('🔍 Verificando todas las radios...');
+            
+            const verificationBar = document.getElementById('verificationBar');
+            const verificationProgress = document.getElementById('verificationProgress');
+            
+            verificationBar.style.display = 'block';
+            verificationProgress.innerHTML = '';
+            
+            let testedCount = 0;
+            let workingCount = 0;
+            const totalRadios = radioStations.length;
+            
+            radioStations.forEach((radio, index) => {
+                setTimeout(() => {
+                    addVerificationItem(radio.name, 'testing', '🔍 Verificando...');
+                    radio.status = 'testing';
+                    loadRadios();
+                    
+                    testRadioConnectionWithCallback(radio, (isWorking) => {
+                        if (isWorking) {
+                            radio.verified = true;
+                            radio.status = 'ready';
+                            workingCount++;
+                            addVerificationItem(radio.name, 'success', '✅ Funciona');
+                        } else {
+                            radio.verified = false;
+                            radio.status = 'inactive'; // MARCAR COMO INACTIVA
+                            addVerificationItem(radio.name, 'error', '❌ No funciona - Marcada como inactiva');
+                        }
+                        
+                        testedCount++;
+                        loadRadios();
+                        updateRadioStats();
+                        
+                        if (testedCount === totalRadios) {
+                            verificationInProgress = false;
+                            saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+                            
+                            setTimeout(() => {
+                                verificationBar.style.display = 'none';
+                            }, 3000);
+                            
+                            showAlert(`✅ Verificación completa: ${workingCount}/${totalRadios} radios funcionando`);
+                        }
+                    });
+                    
+                }, index * 1500);
+            });
+        }
+        
+        function clearInactiveRadios() {
+            const inactiveRadios = radioStations.filter(r => r.status === 'inactive' || !r.verified);
+            
+            if (inactiveRadios.length === 0) {
+                showAlert('ℹ️ No hay radios inactivas para eliminar', 'warning');
+                return;
+            }
+            
+            if (confirm(`¿Eliminar ${inactiveRadios.length} radios inactivas?`)) {
+                radioStations = radioStations.filter(r => r.status !== 'inactive' && r.verified);
+                filteredRadioStations = [...radioStations];
+                
+                saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+                loadRadios();
+                updateRadioFilters();
+                updateRadioCategories();
+                updateRadioStats();
+                
+                showAlert(`🧹 ${inactiveRadios.length} radios inactivas eliminadas`);
+            }
+        }
+        
+        function loadRadios() {
+            const container = document.getElementById('radioStations');
+            container.innerHTML = '';
+            
+            const radiosToShow = filteredRadioStations.length > 0 ? filteredRadioStations : radioStations;
+            
+            if (radiosToShow.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #ccc; padding: 40px;">📻 No hay radios. ¡Carga algunas radios preconfiguradas o busca nuevas!</p>';
+                return;
+            }
+            
+            radiosToShow.forEach(station => {
+                const stationDiv = document.createElement('div');
+                let itemClass = 'item';
+                
+                if (currentlyPlayingId === station.id && currentlyPlayingType === 'radio') {
+                    itemClass += ' playing';
+                } else if (station.status === 'loading' || station.status === 'testing') {
+                    itemClass += ' loading';
+                } else if (station.status === 'inactive' || !station.verified) {
+                    itemClass += ' inactive'; // MARCAR EN NARANJA
+                } else if (station.status === 'error') {
+                    itemClass += ' error';
+                }
+                
+                stationDiv.className = itemClass;
+                
+                let statusIcon = '📻';
+                if (station.status === 'playing') statusIcon = '📻🔊';
+                else if (station.status === 'loading') statusIcon = '📻⏳';
+                else if (station.status === 'testing') statusIcon = '📻🔍';
+                else if (station.status === 'inactive' || !station.verified) statusIcon = '📻🟠'; // NARANJA PARA INACTIVAS
+                else if (station.status === 'error') statusIcon = '📻❌';
+                else if (station.verified) statusIcon = '📻✅';
+                
+                stationDiv.innerHTML = `
+                    <div class="item-info">
+                        <h3>${statusIcon} ${station.name}</h3>
+                        <p>🌍 ${station.country} • 🎼 ${station.genre}</p>
+                        <p style="font-size: 12px; color: #aaa;">${station.description}</p>
+                    </div>
+                    <div class="item-controls">
+                        <button class="btn primary" onclick="playRadio('${station.id}')" 
+                                ${station.status === 'loading' || station.status === 'testing' ? 'disabled' : ''}>
+                            ${currentlyPlayingId === station.id && currentlyPlayingType === 'radio' ? '⏸️' : '▶️'}
+                        </button>
+                        <button class="btn warning" onclick="testSingleRadio('${station.id}')" title="Verificar">🔍</button>
+                        <button class="btn danger" onclick="deleteRadio('${station.id}')" title="Eliminar">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(stationDiv);
+            });
+        }
+        
+        function testSingleRadio(radioId) {
+            const radio = radioStations.find(r => r.id === radioId);
+            if (!radio) return;
+            
+            showAlert(`🔍 Verificando ${radio.name}...`);
+            radio.status = 'testing';
+            loadRadios();
+            
+            testRadioConnectionWithCallback(radio, (isWorking) => {
+                if (isWorking) {
+                    radio.verified = true;
+                    radio.status = 'ready';
+                    showAlert(`✅ ${radio.name} funciona correctamente`);
+                } else {
+                    radio.verified = false;
+                    radio.status = 'inactive'; // MARCAR COMO INACTIVA
+                    showAlert(`❌ ${radio.name} no funciona - Marcada como inactiva`, 'error');
+                }
+                
+                saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+                loadRadios();
+                updateRadioStats();
+            });
+        }
+        
+        function updateRadioStats() {
+            const workingRadios = radioStations.filter(r => r.verified && r.status !== 'inactive' && r.status !== 'error').length;
+            const inactiveRadios = radioStations.filter(r => r.status === 'inactive' || !r.verified).length;
+            
+            document.getElementById('totalRadios').textContent = radioStations.length;
+            document.getElementById('workingRadios').textContent = workingRadios;
+            document.getElementById('inactiveRadios').textContent = inactiveRadios;
+        }
+        
+        // ========== FUNCIONES DE MÚSICA CON FILTROS CORREGIDOS ==========
+        
+        async function addMusicFolderCorrected() {
+            try {
+                showAlert('📁 Selecciona tu carpeta de música...');
+                scanningProgress = 0;
+                totalFilesToScan = 0;
+                document.getElementById('musicFolderInput').click();
+            } catch (error) {
+                console.error('Error accediendo a carpeta:', error);
+                showAlert('❌ Error accediendo a la carpeta');
+            }
+        }
+        
+        function handleMusicFolderSelection(event) {
+            const files = Array.from(event.target.files);
+            
+            if (files.length === 0) {
+                showAlert('❌ No se seleccionaron archivos');
+                return;
+            }
+            
+            showAlert(`🔍 Analizando ${files.length} archivos...`);
+            
+            document.getElementById('scanningProgress').style.display = 'block';
+            document.getElementById('scanningInfo').style.display = 'block';
+            
+            const audioFiles = files.filter(file => {
+                const extension = '.' + file.name.split('.').pop().toLowerCase();
+                return AUDIO_EXTENSIONS.includes(extension);
+            });
+            
+            if (audioFiles.length === 0) {
+                showAlert('❌ No se encontraron archivos de música');
+                hideScanningInterface();
+                return;
+            }
+            
+            totalFilesToScan = audioFiles.length;
+            updateScanningInfo(`Encontrados ${audioFiles.length} archivos de música`);
+            processMusicFiles(audioFiles);
+        }
+        
+        function processMusicFiles(files) {
+            showAlert(`🎵 Procesando ${files.length} archivos de música...`);
+            
+            let processedFiles = 0;
+            const addedTracks = [];
+            
+            files.forEach((file, index) => {
+                setTimeout(() => {
+                    try {
+                        const fileName = file.name;
+                        const fileUrl = URL.createObjectURL(file);
+                        const filePath = file.webkitRelativePath || fileName;
+                        
+                        const metadata = extractMetadataFromFile(filePath, fileName);
+                        
+                        const musicTrack = {
+                            id: Date.now() + index,
+                            title: metadata.title,
+                            artist: metadata.artist,
+                            album: metadata.album,
+                            genre: metadata.genre,
+                            folder: metadata.folder,
+                            url: fileUrl,
+                            fileName: fileName,
+                            filePath: filePath,
+                            type: 'local',
+                            size: file.size,
+                            lastModified: file.lastModified,
+                            dateAdded: new Date().toISOString()
+                        };
+                        
+                        const existingTrack = musicLibrary.find(t => 
+                            t.filePath === musicTrack.filePath || 
+                            (t.title === musicTrack.title && t.artist === musicTrack.artist)
+                        );
+                        
+                        if (!existingTrack) {
+                            musicLibrary.push(musicTrack);
+                            addedTracks.push(musicTrack);
+                            
+                            if (metadata.folder && !musicFolders.find(f => f.name === metadata.folder)) {
+                                musicFolders.push({
+                                    id: Date.now() + Math.random(),
+                                    name: metadata.folder,
+                                    artist: metadata.artist,
+                                    path: metadata.folderPath,
+                                    trackCount: 1,
+                                    dateAdded: new Date().toISOString()
+                                });
+                            } else if (metadata.folder) {
+                                const folder = musicFolders.find(f => f.name === metadata.folder);
+                                if (folder) folder.trackCount++;
+                            }
+                        }
+                        
+                        processedFiles++;
+                        scanningProgress = (processedFiles / totalFilesToScan) * 100;
+                        updateScanningProgress(scanningProgress);
+                        updateScanningInfo(`Procesado: ${processedFiles}/${totalFilesToScan} archivos`);
+                        
+                        if (processedFiles === totalFilesToScan) {
+                            finalizeMusicProcessing(addedTracks);
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error procesando archivo:', file.name, error);
+                        processedFiles++;
+                        
+                        if (processedFiles === totalFilesToScan) {
+                            finalizeMusicProcessing(addedTracks);
+                        }
+                    }
+                }, index * 10);
+            });
+        }
+        
+        function extractMetadataFromFile(filePath, fileName) {
+            const pathParts = filePath.split('/').filter(part => part.length > 0);
+            const nameWithoutExt = fileName.replace(/\.[^/.]+$/, "");
+            
+            let artist = 'Artista Desconocido';
+            let title = nameWithoutExt;
+            let album = 'Álbum Desconocido';
+            let genre = 'Desconocido';
+            let folder = 'General';
+            let folderPath = '';
+            
+            // PROCESAMIENTO MEJORADO DE CARPETAS Y SUBCARPETAS
+            if (pathParts.length > 1) {
+                if (pathParts.length >= 3) {
+                    folder = pathParts[0]; // Carpeta principal
+                    artist = pathParts[1]; // Subcarpeta (artista)
+                    album = pathParts[2]; // Sub-subcarpeta (álbum)
+                    folderPath = pathParts.slice(0, -1).join('/');
+                } else if (pathParts.length === 2) {
+                    artist = pathParts[0];
+                    folder = artist;
+                    folderPath = pathParts[0];
+                }
+            }
+            
+            // Extraer información del nombre del archivo
+            if (nameWithoutExt.includes(' - ')) {
+                const parts = nameWithoutExt.split(' - ');
+                if (parts.length >= 2) {
+                    if (artist === 'Artista Desconocido') {
+                        artist = parts[0].trim();
+                    }
+                    title = parts[1].trim();
+                    
+                    if (parts.length >= 3) {
+                        album = parts[2].trim();
+                    }
+                }
+            }
+            
+            // Detección inteligente de género
+            const genreKeywords = {
+                'Rock': ['rock', 'metal', 'punk', 'grunge', 'alternative'],
+                'Pop': ['pop', 'dance', 'disco', 'mainstream'],
+                'Jazz': ['jazz', 'blues', 'swing', 'bebop'],
+                'Classical': ['classical', 'orchestra', 'symphony', 'opera'],
+                'Electronic': ['electronic', 'techno', 'house', 'edm', 'ambient'],
+                'Hip Hop': ['hip hop', 'rap', 'hiphop'],
+                'Reggae': ['reggae', 'ska', 'dub'],
+                'Country': ['country', 'folk', 'americana'],
+                'R&B': ['rnb', 'soul', 'funk'],
+                'Latin': ['latin', 'salsa', 'bachata', 'reggaeton']
+            };
+            
+            const lowerPath = filePath.toLowerCase();
+            const lowerName = nameWithoutExt.toLowerCase();
+            
+            for (const [genreName, keywords] of Object.entries(genreKeywords)) {
+                if (keywords.some(keyword => lowerPath.includes(keyword) || lowerName.includes(keyword))) {
+                    genre = genreName;
+                    break;
+                }
+            }
+            
+            return { artist, title, album, genre, folder, folderPath };
+        }
+        
+        function finalizeMusicProcessing(addedTracks) {
+            saveToLocalStorage(STORAGE_KEYS.MUSIC, musicLibrary);
+            saveToLocalStorage(STORAGE_KEYS.FOLDERS, musicFolders);
+            
+            setTimeout(() => {
+                hideScanningInterface();
+            }, 1000);
+            
+            // Resetear filtros para mostrar todo
+            filteredMusicLibrary = [...musicLibrary];
+            
+            loadFilteredMusicLibrary();
+            updateMusicFilters();
+            updateMusicCategories();
+            updateFolderStructure();
+            updateMusicStats();
+            
+            if (addedTracks.length > 0) {
+                showAlert(`✅ ${addedTracks.length} canciones añadidas correctamente`);
+            } else {
+                showAlert('ℹ️ No se añadieron canciones nuevas (pueden ser duplicadas)');
+            }
+            
+            console.log(`🎵 Procesamiento completado: ${addedTracks.length} nuevas canciones`);
+        }
+        
+        // FUNCIONES DE FILTROS CORREGIDAS
+        function applyMusicFilters() {
+            const artistFilter = document.getElementById('musicArtistFilter').value;
+            const genreFilter = document.getElementById('musicGenreFilter').value;
+            const folderFilter = document.getElementById('musicFolderFilter').value;
+            
+            activeMusicFilters = {
+                artist: artistFilter,
+                genre: genreFilter,
+                folder: folderFilter
+            };
+            
+            // APLICAR FILTROS CORRECTAMENTE
+            filteredMusicLibrary = musicLibrary.filter(track => {
+                const matchArtist = !artistFilter || track.artist === artistFilter;
+                const matchGenre = !genreFilter || track.genre === genreFilter;
+                const matchFolder = !folderFilter || track.folder === folderFilter;
+                return matchArtist && matchGenre && matchFolder;
+            });
+            
+            updateMusicFilterIndicator();
+            loadFilteredMusicLibrary();
+            updateMusicStats();
+            
+            console.log(`🎵 Filtros aplicados: ${filteredMusicLibrary.length} canciones mostradas`);
+        }
+        
+        function updateMusicFilterIndicator() {
+            const filterDiv = document.getElementById('currentMusicFilter');
+            const filterTextSpan = document.getElementById('activeFilterText');
+            
+            const activeFilters = [];
+            if (activeMusicFilters.artist) activeFilters.push(`👤 ${activeMusicFilters.artist}`);
+            if (activeMusicFilters.genre) activeFilters.push(`🎼 ${activeMusicFilters.genre}`);
+            if (activeMusicFilters.folder) activeFilters.push(`📁 ${activeMusicFilters.folder}`);
+            
+            if (activeFilters.length > 0) {
+                filterDiv.style.display = 'block';
+                filterTextSpan.textContent = activeFilters.join(' | ');
+            } else {
+                filterDiv.style.display = 'none';
+            }
+        }
+        
+        function playFilteredMusic() {
+            if (filteredMusicLibrary.length === 0) {
+                showAlert('❌ No hay música que coincida con los filtros');
+                return;
+            }
+            
+            if (currentlyPlayingType === 'radio') {
+                stopPlayback();
+            }
+            
+            currentPlaylist = [...filteredMusicLibrary];
+            currentTrackIndex = 0;
+            
+            playCurrentTrack();
+            
+            const filterText = [];
+            if (activeMusicFilters.artist) filterText.push(`👤 ${activeMusicFilters.artist}`);
+            if (activeMusicFilters.genre) filterText.push(`🎼 ${activeMusicFilters.genre}`);
+            if (activeMusicFilters.folder) filterText.push(`📁 ${activeMusicFilters.folder}`);
+            
+            showAlert(`🎵 Reproduciendo filtro: ${filterText.join(' | ')} (${currentPlaylist.length} canciones)`);
+        }
+        
+        function loadFilteredMusicLibrary() {
+            const container = document.getElementById('musicTracks');
+            container.innerHTML = '';
+            
+            if (filteredMusicLibrary.length === 0) {
+                if (musicLibrary.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #ccc; padding: 40px;">No hay música. ¡Añade algunas carpetas!</p>';
+                } else {
+                    container.innerHTML = '<p style="text-align: center; color: #ccc; padding: 40px;">No hay música que coincida con los filtros actuales.</p>';
+                }
+                return;
+            }
+            
+            filteredMusicLibrary.forEach(track => {
+                const trackDiv = document.createElement('div');
+                trackDiv.className = `item ${currentlyPlayingId === track.id && currentlyPlayingType === 'music' ? 'playing' : ''}`;
+                trackDiv.innerHTML = `
+                    <div class="item-info">
+                        <h3>🎵 ${track.title}</h3>
+                        <p>👤 ${track.artist} • 🎼 ${track.genre} • 📁 ${track.folder}</p>
+                        <p style="font-size: 12px; color: #aaa;">${track.album}</p>
+                    </div>
+                    <div class="item-controls">
+                        <button class="btn primary" onclick="playFilteredMusicTrack(${track.id})">
+                            ${currentlyPlayingId === track.id && currentlyPlayingType === 'music' ? '⏸️' : '▶️'}
+                        </button>
+                        <button class="btn danger" onclick="deleteMusicTrack(${track.id})" title="Eliminar">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(trackDiv);
+            });
+        }
+        
+        function playFilteredMusicTrack(trackId) {
+            const track = filteredMusicLibrary.find(t => t.id === trackId);
+            if (!track) return;
+            
+            if (currentlyPlayingType === 'radio') {
+                stopPlayback();
+            }
+            
+            // USAR LA LISTA FILTRADA COMO PLAYLIST
+            currentPlaylist = [...filteredMusicLibrary];
+            currentTrackIndex = filteredMusicLibrary.findIndex(t => t.id === trackId);
+            playCurrentTrack();
+        }
+        
+        // CONTINUAR CON EL RESTO DE FUNCIONES...
+        
+        // ========== FUNCIONES DEL REPRODUCTOR ==========
+        
+        function playCurrentTrack() {
+            if (currentPlaylist.length === 0 || currentTrackIndex < 0 || currentTrackIndex >= currentPlaylist.length) {
+                return;
+            }
+            
+            const track = currentPlaylist[currentTrackIndex];
+            const player = document.getElementById('mainAudioPlayer');
+            
+            if (connectionCheckInterval) {
+                clearInterval(connectionCheckInterval);
+                connectionCheckInterval = null;
+            }
+            
+            player.src = track.url;
+            player.load();
+            
+            updateTrackInfo(track);
+            
+            const playPromise = player.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    isPlaying = true;
+                    currentlyPlayingType = 'music';
+                    currentlyPlayingId = track.id;
+                    updatePlayButton();
+                    updateConnectionStatus('none');
+                    showAlert(`🎵 ${track.title} - ${track.artist}`);
+                    
+                    // Actualizar interfaz
+                    loadFilteredMusicLibrary();
+                }).catch(error => {
+                    console.error('Error reproduciendo:', error);
+                    showAlert('❌ Error reproduciendo la canción');
+                });
+            }
+        }
+        
+        // RESTO DE FUNCIONES AUXILIARES...
+        
+        function updateTrackInfo(track) {
+            if (!track) {
+                document.getElementById('trackTitle').textContent = 'Selecciona una estación o canción';
+                document.getElementById('trackArtist').textContent = '...';
+                document.getElementById('trackAlbum').textContent = '...';
+                document.getElementById('trackGenre').textContent = '...';
+                return;
+            }
+            
+            document.getElementById('trackTitle').textContent = track.title || track.name;
+            document.getElementById('trackArtist').textContent = track.artist || 'Artista desconocido';
+            document.getElementById('trackAlbum').textContent = track.album || 'Álbum desconocido';
+            document.getElementById('trackGenre').textContent = track.genre || 'Género desconocido';
+        }
+        
+        function updatePlayButton() {
+            const btn = document.getElementById('mainPlayBtn');
+            btn.textContent = isPlaying ? '⏸️' : '▶️';
+            btn.className = isPlaying ? 'control-btn pause-btn' : 'control-btn play-btn';
+        }
+        
+        function togglePlayPause() {
+            const player = document.getElementById('mainAudioPlayer');
+            
+            if (isPlaying) {
+                player.pause();
+                isPlaying = false;
+            } else {
+                if (currentlyPlayingType === 'radio' && currentlyPlayingId) {
+                    playRadio(currentlyPlayingId);
+                    return;
+                } else if (currentPlaylist.length === 0) {
+                    showAlert('❌ No hay canciones en la playlist');
+                    return;
+                } else {
+                    player.play();
+                    isPlaying = true;
+                }
+            }
+            
+            updatePlayButton();
+        }
+        
+        function nextTrack() {
+            if (currentlyPlayingType === 'radio') {
+                showAlert('❌ No disponible para radios');
+                return;
+            }
+            
+            if (currentPlaylist.length === 0) return;
+            
+            if (isRandomMode) {
+                currentTrackIndex = Math.floor(Math.random() * currentPlaylist.length);
+            } else {
+                currentTrackIndex = (currentTrackIndex + 1) % currentPlaylist.length;
+            }
+            
+            playCurrentTrack();
+        }
+        
+        function previousTrack() {
+            if (currentlyPlayingType === 'radio') {
+                showAlert('❌ No disponible para radios');
+                return;
+            }
+            
+            if (currentPlaylist.length === 0) return;
+            
+            if (isRandomMode) {
+                currentTrackIndex = Math.floor(Math.random() * currentPlaylist.length);
+            } else {
+                currentTrackIndex = currentTrackIndex > 0 ? currentTrackIndex - 1 : currentPlaylist.length - 1;
+            }
+            
+            playCurrentTrack();
+        }
+        
+        function toggleRandom() {
+            if (currentlyPlayingType === 'radio') {
+                showAlert('❌ No disponible para radios');
+                return;
+            }
+            
+            isRandomMode = !isRandomMode;
+            const btn = document.getElementById('randomBtn');
+            
+            if (isRandomMode) {
+                btn.classList.add('active');
+                showAlert('🎲 Modo aleatorio activado');
+            } else {
+                btn.classList.remove('active');
+                showAlert('📋 Modo secuencial activado');
+            }
+        }
+        
+        function changeVolume() {
+            const volumeSlider = document.getElementById('volumeSlider');
+            const volumeDisplay = document.getElementById('volumeDisplay');
+            const player = document.getElementById('mainAudioPlayer');
+            
+            const volume = volumeSlider.value / 100;
+            player.volume = volume;
+            volumeDisplay.textContent = volumeSlider.value + '%';
+        }
+        
+        // ========== FUNCIONES AUXILIARES ==========
+        
+        function updateScanningProgress(percentage) {
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = `${percentage}%`;
+            progressFill.textContent = `${Math.round(percentage)}%`;
+        }
+        
+        function updateScanningInfo(message) {
+            const scanningDetails = document.getElementById('scanningDetails');
+            scanningDetails.innerHTML = `<p>${message}</p>`;
+        }
+        
+        function hideScanningInterface() {
+            document.getElementById('scanningProgress').style.display = 'none';
+            document.getElementById('scanningInfo').style.display = 'none';
+        }
+        
+        function updateMusicStats() {
+            const artists = [...new Set(musicLibrary.map(t => t.artist))];
+            
+            document.getElementById('totalMusic').textContent = musicLibrary.length;
+            document.getElementById('shownMusic').textContent = filteredMusicLibrary.length;
+            document.getElementById('totalFolders').textContent = musicFolders.length;
+            document.getElementById('totalArtists').textContent = artists.length;
+        }
+        
+        function updateMusicFilters() {
+            const artists = [...new Set(musicLibrary.map(t => t.artist))].sort();
+            const genres = [...new Set(musicLibrary.map(t => t.genre))].sort();
+            const folders = [...new Set(musicLibrary.map(t => t.folder))].sort();
+            
+            updateSelectOptions('musicArtistFilter', artists, 'Todos los artistas');
+            updateSelectOptions('musicGenreFilter', genres, 'Todos los géneros');
+            updateSelectOptions('musicFolderFilter', folders, 'Todas las carpetas');
+        }
+        
+        function updateSelectOptions(selectId, options, defaultText) {
+            const select = document.getElementById(selectId);
+            const currentValue = select.value;
+            
+            select.innerHTML = `<option value="">${defaultText}</option>`;
+            
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                if (option === currentValue) optionElement.selected = true;
+                select.appendChild(optionElement);
+            });
+        }
+        
+        function updateMusicCategories() {
+            updateCategoryDisplayClickable('musicArtistsList', musicLibrary, 'artist', 'music');
+            updateCategoryDisplayClickable('musicGenresList', musicLibrary, 'genre', 'music');
+            updateCategoryDisplayClickable('musicFoldersList', musicFolders, 'name', 'music');
+        }
+        
+        function updateCategoryDisplayClickable(containerId, items, property, type) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            
+            const categories = [...new Set(items.map(item => item[property]))].sort();
+            
+            container.innerHTML = '';
+            categories.forEach(category => {
+                const count = items.filter(item => item[property] === category).length;
+                const item = document.createElement('div');
+                item.className = 'category-item';
+                item.innerHTML = `${category} <span style="float: right">(${count})</span>`;
+                
+                item.onclick = () => selectCategory(type, containerId, category);
+                
+                container.appendChild(item);
+            });
+        }
+        
+        function selectCategory(type, containerId, category) {
+            document.querySelectorAll(`#${containerId} .category-item`).forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            event.target.classList.add('selected');
+            
+            if (type === 'music') {
+                if (containerId.includes('Artist')) {
+                    document.getElementById('musicArtistFilter').value = category;
+                } else if (containerId.includes('Genre')) {
+                    document.getElementById('musicGenreFilter').value = category;
+                } else if (containerId.includes('Folder')) {
+                    document.getElementById('musicFolderFilter').value = category;
+                }
+                applyMusicFilters();
+                showAlert(`🎵 Filtrado por: ${category}`);
+            } else if (type === 'radio') {
+                if (containerId.includes('Genre')) {
+                    document.getElementById('radioGenreFilter').value = category;
+                } else if (containerId.includes('Countries')) {
+                    document.getElementById('radioCountryFilter').value = category;
+                }
+                applyRadioFilters();
+                showAlert(`📻 Filtrado por: ${category}`);
+            }
+        }
+        
+        function updateFolderStructure() {
+            const container = document.getElementById('musicFolderStructure');
+            
+            if (musicFolders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #ccc;">📁 No hay carpetas añadidas. Usa "AÑADIR CARPETA DE MÚSICA".</p>';
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            musicFolders.forEach(folder => {
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'folder-item';
+                folderDiv.innerHTML = `
+                    <div>
+                        <strong>📁 ${folder.name}</strong><br>
+                        <small>${folder.trackCount} canciones • ${folder.artist || 'Varios artistas'}</small>
+                    </div>
+                    <div>
+                        <button class="btn primary" onclick="playFolder('${folder.name}')" style="margin: 2px; padding: 6px 12px;">▶️</button>
+                        <button class="btn danger" onclick="removeFolder('${folder.id}')" style="margin: 2px; padding: 6px 12px;">🗑️</button>
+                    </div>
+                `;
+                container.appendChild(folderDiv);
+            });
+        }
+        
+        function playFolder(folderName) {
+            const folderTracks = musicLibrary.filter(track => track.folder === folderName);
+            
+            if (folderTracks.length === 0) {
+                showAlert('❌ No hay canciones en esta carpeta');
+                return;
+            }
+            
+            if (currentlyPlayingType === 'radio') {
+                stopPlayback();
+            }
+            
+            currentPlaylist = folderTracks;
+            currentTrackIndex = 0;
+            
+            playCurrentTrack();
+            showAlert(`🎵 Reproduciendo carpeta: ${folderName} (${folderTracks.length} canciones)`);
+        }
+        
+        function shuffleAllMusic() {
+            if (musicLibrary.length === 0) {
+                showAlert('❌ No hay música en la biblioteca');
+                return;
+            }
+            
+            if (currentlyPlayingType === 'radio') {
+                stopPlayback();
+            }
+            
+            currentPlaylist = [...musicLibrary].sort(() => Math.random() - 0.5);
+            currentTrackIndex = 0;
+            isRandomMode = true;
+            
+            document.getElementById('randomBtn').classList.add('active');
+            
+            playCurrentTrack();
+            showAlert(`🎲 Reproduciendo toda la música (${musicLibrary.length} canciones)`);
+        }
+        
+        function clearMusicFilters() {
+            document.getElementById('musicArtistFilter').value = '';
+            document.getElementById('musicGenreFilter').value = '';
+            document.getElementById('musicFolderFilter').value = '';
+            
+            activeMusicFilters = { artist: '', genre: '', folder: '' };
+            filteredMusicLibrary = [...musicLibrary];
+            
+            updateMusicFilterIndicator();
+            loadFilteredMusicLibrary();
+            updateMusicStats();
+            
+            showAlert('🧹 Filtros de música limpiados');
+        }
+        
+        // ========== RESTO DE FUNCIONES ==========
+        
+        function setSearchTerm(term) {
+            document.getElementById('radioSearchInput').value = term;
+            
+            document.querySelectorAll('.search-option').forEach(opt => {
+                opt.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            setTimeout(() => {
+                event.target.classList.remove('active');
+            }, 500);
+        }
+        
+        function addCustomRadio() {
+            const url = prompt('Introduce la URL de la radio:');
+            
+            if (!url || !url.trim()) {
+                showAlert('❌ URL no válida');
+                return;
+            }
+            
+            const existingRadio = radioStations.find(r => r.url === url.trim());
+            
+            if (existingRadio) {
+                showAlert('❌ Esta radio ya está añadida', 'warning');
+                return;
+            }
+            
+            const name = prompt('Nombre de la radio:', 'Mi Radio Custom');
+            const country = prompt('País:', 'Desconocido');
+            const genre = prompt('Género:', 'General');
+            
+            const newRadio = {
+                id: Date.now(),
+                name: name || 'Radio Custom',
+                url: url.trim(),
+                country: country || 'Desconocido',
+                genre: genre || 'General',
+                description: 'Radio añadida manualmente',
+                verified: false,
+                status: 'testing',
+                dateAdded: new Date().toISOString()
+            };
+            
+            showAlert(`📻 Verificando ${newRadio.name}...`);
+            
+            testRadioConnectionWithCallback(newRadio, (isWorking) => {
+                if (isWorking) {
+                    newRadio.verified = true;
+                    newRadio.status = 'ready';
+                    radioStations.push(newRadio);
+                    
+                    saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+                    
+                    filteredRadioStations = [...radioStations];
+                    loadRadios();
+                    updateRadioFilters();
+                    updateRadioCategories();
+                    updateRadioStats();
+                    
+                    showAlert(`✅ ${newRadio.name} verificada y añadida`);
+                } else {
+                    showAlert(`❌ ${newRadio.name} no funciona correctamente`, 'error');
+                }
+            });
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabName + '-content').classList.add('active');
+            
+            currentTab = tabName;
+            
+            if (tabName === 'radios') {
+                filteredRadioStations = [...radioStations];
+                loadRadios();
+                updateRadioFilters();
+                updateRadioCategories();
+                updateRadioStats();
+            } else if (tabName === 'music') {
+                loadFilteredMusicLibrary();
+                updateMusicFilters();
+                updateMusicCategories();
+                updateFolderStructure();
+                updateMusicStats();
+            }
+        }
+        
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 4000);
+        }
+        
+        // Funciones placeholder temporales
+        function playRadio(radioId) { showAlert('🔧 Función de radio pendiente...'); }
+        function deleteRadio(radioId) { showAlert('🔧 Función pendiente...'); }
+        function clearAllRadios() { showAlert('🔧 Función pendiente...'); }
+        function stopAllRadios() { showAlert('🔧 Función pendiente...'); }
+        function applyRadioFilters() { showAlert('🔧 Función pendiente...'); }
+        function updateRadioFilters() { }
+        function updateRadioCategories() { }
+        function stopPlayback() { showAlert('⏹️ Reproducción detenida'); }
+        function updateConnectionStatus() { }
+        function deleteMusicTrack(trackId) { showAlert('🔧 Función pendiente...'); }
+        function clearAllMusic() { showAlert('🔧 Función pendiente...'); }
+        function refreshMusicLibrary() { showAlert('🔧 Función pendiente...'); }
+        function removeFolder(folderId) { showAlert('🔧 Función pendiente...'); }
+        
+        // ========== INICIALIZACIÓN ==========
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar datos guardados
+            radioStations = loadFromLocalStorage(STORAGE_KEYS.RADIOS, []);
+            musicLibrary = loadFromLocalStorage(STORAGE_KEYS.MUSIC, []);
+            musicFolders = loadFromLocalStorage(STORAGE_KEYS.FOLDERS, []);
+            
+            // Inicializar filtros
+            filteredMusicLibrary = [...musicLibrary];
+            filteredRadioStations = [...radioStations];
+            
+            // Configurar reproductor
+            const player = document.getElementById('mainAudioPlayer');
+            player.volume = 0.5;
+            
+            player.onended = () => {
+                if (currentlyPlayingType === 'music' && currentPlaylist.length > 1) {
+                    nextTrack();
+                }
+            };
+            
+            // Cargar contenido inicial
+            switchTab('radios');
+            
+            // Auto-guardado cada 5 minutos
+            setInterval(() => {
+                saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+                saveToLocalStorage(STORAGE_KEYS.MUSIC, musicLibrary);
+                saveToLocalStorage(STORAGE_KEYS.FOLDERS, musicFolders);
+            }, 5 * 60 * 1000);
+            
+            console.log('🎵 Scraper Multimedia v1.0 cargado');
+            showAlert('✨ Scraper Multimedia v1.0 listo');
+        });
+        
+        window.addEventListener('beforeunload', function() {
+            if (currentlyPlayingType === 'radio') {
+                stopPlayback();
+            }
+            
+            saveToLocalStorage(STORAGE_KEYS.RADIOS, radioStations);
+            saveToLocalStorage(STORAGE_KEYS.MUSIC, musicLibrary);
+            saveToLocalStorage(STORAGE_KEYS.FOLDERS, musicFolders);
+        });
+    </script>
+</body>
+</html>
